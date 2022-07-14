@@ -19,26 +19,26 @@ jobs:
         runs-on: ubuntu-latest
         # specify the actions to be performed
         steps:
-            # checkout the action repository 
-            - uses: actions/checkout@v3
-            # specify java action required for our flutter actions
-            - uses: actions/setup-java@v3
-                # define java version to be used
-                with: 
-                    java-version: "12.x"
-            # define the action to be used for flutter 
-            # subosito action will allow to run the flutter commands (test, analyze, build...)
-            - uses: subosito/flutter-action
-                # define subosito action version to be used
-                with:
-                    channel: "stable"
-            # thanks to the action defined above some flutter commands can be executed
-            # get flutter latest stable version
-            - run: flutter pub get
-            # execute analyze action
-            - run: flutter analyze
-            # execute test action 
-            - run: flutter test
+        # checkout the action repository
+        - uses: actions/checkout@v3
+        # specify java action required for our flutter actions
+        - uses: actions/setup-java@v3
+            # define java version to be used
+            with:
+                java-version: "12.x"
+        # define the action to be used for flutter
+        # subosito action will allow to run the flutter commands (test, analyze, build...)
+        - uses: subosito/flutter-action@v2
+            # define subosito action version to be used
+            with:
+                channel: "stable"
+        # thanks to the action defined above some flutter commands can be executed
+        # get flutter latest stable version
+        - run: flutter pub get
+        # execute analyze action
+        - run: flutter analyze
+        # execute test action
+        - run: flutter test
     
     # job 2
     # extra check build the app with the github actions
@@ -51,24 +51,24 @@ jobs:
         runs-on: ubuntu-latest
         # define the steps of the job
         steps:
-            # checkout the action repository 
-            - uses: actions/checkout@v2
-            # specify java action required for our flutter actions
-            - uses: actions/setup-java@v1
-                # define java version to be used
-                with: 
-                    java-version: "12.x"
-            # define the action to be used for flutter 
-            # subosito action will allow to run the flutter commands (test, analyze, build...)
-            - uses: subosito/flutter-action
-                # define subosito action version to be used
-                with:
-                    channel: "stable"
-            # thanks to the action defined above some flutter commands can be executed
-            # get flutter latest stable version
-            - run: flutter pub get
-            # execute flutter clean before the build
-            - run: flutter clean
-            # define the command that actually will build the app for android 
-            - run : flutter build appbundle
+        # checkout the action repository
+        - uses: actions/checkout@v2
+        # specify java action required for our flutter actions
+        - uses: actions/setup-java@v1
+            # define java version to be used
+            with:
+                java-version: "12.x"
+        # define the action to be used for flutter
+        # subosito action will allow to run the flutter commands (test, analyze, build...)
+        - uses: subosito/flutter-action@v2
+            # define subosito action version to be used
+            with:
+                channel: "stable"
+        # thanks to the action defined above some flutter commands can be executed
+        # get flutter latest stable version
+        - run: flutter pub get
+        # execute flutter clean before the build
+        - run: flutter clean
+        # define the command that actually will build the app for android
+        - run : flutter build appbundle
     
