@@ -1,0 +1,74 @@
+# define the name of the workflow
+name: CI
+
+# define the scenario where it should run 
+on:
+    # this will run whenever a PR is created on the master branch
+    pull_request:
+        # define in which branches this pull_request should affect
+        branches:
+            - master
+            
+# define jobs to be performed            
+jobs:
+    # job 1
+    flutter_test:
+        # This will show whenever a workflow is executed
+        name: Run flutter test and analyze
+        # specify the system to run this job
+        runs-on: ubuntu-latest
+        # specify the actions to be performed
+        steps:
+            # checkout the action repository 
+            - uses: actions/checkout@v2
+            # specify java action required for our flutter actions
+            - uses: actions/setup-java@v1
+                # define java version to be used
+                with: 
+                    java-version: "12.x"
+            # define the action to be used for flutter 
+            # subosito action will allow to run the flutter commands (test, analyze, build...)
+            - uses: subosito/flutter-action
+                # define subosito action version to be used
+                with:
+                    channel: "stable"
+            # thanks to the action defined above some flutter commands can be executed
+            # get flutter latest stable version
+            - run: flutter pub get
+            # execute analyze action
+            - run: flutter analyze
+            # execute test action 
+            - run: flutter test
+    
+    # job 2
+    # extra check build the app with the github actions
+    build_appbundle:
+        # define job name
+        name: Build Flutter (Android)
+        # build only if "flutter_test or job 1" is successful
+        needs: [flutter_test]
+        # define the machine to run on 
+        runs-on: ubuntu-latest
+        # define the steps of the job
+        steps:
+            # checkout the action repository 
+            - uses: actions/checkout@v2
+            # specify java action required for our flutter actions
+            - uses: actions/setup-java@v1
+                # define java version to be used
+                with: 
+                    java-version: "12.x"
+            # define the action to be used for flutter 
+            # subosito action will allow to run the flutter commands (test, analyze, build...)
+            - uses: subosito/flutter-action
+                # define subosito action version to be used
+                with:
+                    channel: "stable"
+            # thanks to the action defined above some flutter commands can be executed
+            # get flutter latest stable version
+            - run: flutter pub get
+            # execute flutter clean before the build
+            - run: flutter clean
+            # define the command that actually will build the app for android 
+            - run : flutter build appbundle
+    
