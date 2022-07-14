@@ -23,9 +23,9 @@ jobs:
     # specify the actions to be performed
     steps:
       # checkout the action repository
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v2
       # specify java action required for our flutter actions
-      - uses: actions/setup-java@v3
+      - uses: actions/setup-java@v1
         # define java version to be used
         with:
           java-version: "12.x"
