@@ -11,11 +11,11 @@ class Issue {
   String? state;
   String? isLocked;
   String? numComments;
-  User user;
+  User? user;
   List<Assignee>? assignees;
 
   Issue(this.title, this.author, this.description, this.creationDate,
-      this.issueID, this.issueNumber, this.state, this.isLocked, this.numComments, this.user);
+      this.issueID, this.issueNumber, this.state, this.isLocked, this.numComments);
 
   Issue.fromJson(Map<String, dynamic> json)
       : title = json["title"],
@@ -26,6 +26,5 @@ class Issue {
         issueNumber = json["issueNumber"],
         state = json["state"],
         isLocked = json["isLocked"],
-        numComments = json["numComments"],
-        user = json["user"];
+        numComments = json["numComments"];
 }
