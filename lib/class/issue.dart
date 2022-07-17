@@ -14,17 +14,9 @@ class Issue {
   User? user;
   List<Assignee>? assignees;
 
-  Issue(this.title, this.author, this.description, this.creationDate,
-      this.issueID, this.issueNumber, this.state, this.isLocked, this.numComments);
+  Issue(this.title, this.description);
 
   Issue.fromJson(Map<String, dynamic> json)
       : title = json["title"],
-        author = json["author"],
-        description = json["description"],
-        creationDate = json["creationDate"],
-        issueID = json["issueID"],
-        issueNumber = json["issueNumber"],
-        state = json["state"],
-        isLocked = json["isLocked"],
-        numComments = json["numComments"];
+        description = json["body"];
 }

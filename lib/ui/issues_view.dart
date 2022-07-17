@@ -14,10 +14,33 @@ class IssuesView extends StatefulWidget {
 class _IssuesViewState extends State<IssuesView> {
   final _bloc = IssuesBloc();
   final TextEditingController _searchIssueController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
+
+  int _issuePage = 1;
+
+
+  // Dispose resources to avoid memory leaks
+  @override
+  void dispose() {
+    super.dispose();
+    _scrollController.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    _bloc.issuesEventSink.add(InitializeIssueData());
+    _bloc.issuesEventSink.add(InitializeIssueData(_issuePage));
+
+    _scrollController.addListener(() {
+      // Detect scroll reaching an edge
+      if (_scrollController.position.atEdge) {
+        // Detect if the scroll is at bottom position
+        if (_scrollController.position.pixels != 0) {
+          // Fetch next page from API.
+          _issuePage = _issuePage + 1;
+          _bloc.issuesEventSink.add(InitializeIssueData(_issuePage));
+        }
+      }
+    });
 
     return SafeArea(
       top: true,
@@ -79,7 +102,91 @@ class _IssuesViewState extends State<IssuesView> {
                         ),
                       ),
 
-                      const SizedBox(height: 20,),
+                      Container(
+                          margin: const EdgeInsets.only(left: 0, top: 20, bottom: 20),
+                          height: 30.0,
+                          child: ListView(
+                            physics: const BouncingScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            children: <Widget>[
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(45.0),
+
+                                    ),
+                                    side: const BorderSide(width: 1.0, color: Colors.grey),
+                                    primary: Colors.white,
+                                    elevation: 0,
+                                  ),
+                                  onPressed: () {
+
+                                  },
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      text: 'Order by ',
+                                      style: TextStyle(fontSize: 14, color: Colors.black,),
+                                      children: <TextSpan>[
+                                        TextSpan(text: 'creation', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  )
+                              ),
+
+                              const SizedBox(width: 15,),
+
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(45.0),
+
+                                    ),
+                                    side: const BorderSide(width: 1.0, color: Colors.grey),
+                                    primary: Colors.white,
+                                    elevation: 0,
+                                  ),
+                                  onPressed: () {
+                                  },
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      text: 'Order by ',
+                                      style: TextStyle(fontSize: 14, color: Colors.black,),
+                                      children: <TextSpan>[
+                                        TextSpan(text: 'updated', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  )
+                              ),
+
+                              const SizedBox(width: 15,),
+
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(45.0),
+
+                                    ),
+                                    side: const BorderSide(width: 1.0, color: Colors.grey),
+                                    primary: Colors.white,
+                                    elevation: 0,
+                                  ),
+                                  onPressed: () {
+                                  },
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      text: 'Order by ',
+                                      style: TextStyle(fontSize: 14, color: Colors.black,),
+                                      children: <TextSpan>[
+                                        TextSpan(text: 'comments', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  )
+                              ),
+
+                              const SizedBox(width: 20.0),
+                            ],
+                          )
+                      ),
 
                       Expanded(
                           child: StreamBuilder<List<Issue>>(
@@ -90,6 +197,7 @@ class _IssuesViewState extends State<IssuesView> {
                                 return const Center(child: Text('Unexpected error, try again later.'));
                               } else if (snapshot.hasData) {
                                 return GridView.builder(
+                                  controller: _scrollController,
                                   // Disable glow on scroll end
                                   physics: const BouncingScrollPhysics(),
                                   shrinkWrap: true,
@@ -109,8 +217,8 @@ class _IssuesViewState extends State<IssuesView> {
                                             begin: Alignment.topRight,
                                             end: Alignment.bottomLeft,
                                             colors: [
-                                              Color(0xFFE57373),
-                                              Color(0xFFF44336),
+                                              Color(0xFFFFFFFF),
+                                              Color(0xFFFFFFFF),
                                             ],
                                           ),
                                           borderRadius: const BorderRadius.only(
@@ -119,6 +227,7 @@ class _IssuesViewState extends State<IssuesView> {
                                               bottomLeft: Radius.circular(20),
                                               bottomRight: Radius.circular(20)
                                           ),
+                                          border: Border.all(color: Colors.grey),
                                           boxShadow: [
                                             BoxShadow(
                                               color: Colors.grey.withOpacity(0.2),
@@ -145,7 +254,7 @@ class _IssuesViewState extends State<IssuesView> {
                                               ),
 
                                               //const SizedBox(height: 5,),
-                                              const Divider(thickness: 2, height: 20, color: Colors.black45),
+                                              const Divider(thickness: 1, height: 20, color: Colors.grey),
                                               //const SizedBox(height: 5,),
 
                                               Flexible(
@@ -153,8 +262,8 @@ class _IssuesViewState extends State<IssuesView> {
                                                   '${snapshot.data?.elementAt(i).description}',
                                                   style: const TextStyle(
                                                       fontSize: 16,
-                                                      fontWeight: FontWeight.bold,
-                                                      color: Colors.white
+                                                      fontWeight: FontWeight.normal,
+                                                      color: Colors.black
                                                   ),
                                                   //overflow: TextOverflow.ellipsis,
                                                 ),

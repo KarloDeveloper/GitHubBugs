@@ -5,6 +5,7 @@ name: CI
 on:
   # this will run whenever a push is performed on the master branch
   push:
+    # define in which branches this push should affect
     branches: [ "master" ]
 
   # this will run whenever a PR is created on the master branch
@@ -41,7 +42,7 @@ jobs:
       # execute analyze action
       - run: flutter analyze
       # execute test action
-      - run: flutter test
+      # - run: flutter test
     
   # job 2
   # extra check build the app with the github actions
@@ -49,7 +50,7 @@ jobs:
     # define job name
     name: Build Flutter (Android)
     # build only if "flutter_test or job 1" is successful
-    needs: [flutter_test]
+    # needs: [flutter_test]
     # define the machine to run on
     runs-on: ubuntu-latest
     # define the steps of the job

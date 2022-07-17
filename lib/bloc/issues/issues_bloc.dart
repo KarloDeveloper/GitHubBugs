@@ -2,6 +2,7 @@ import 'dart:async';
 import '../../class/issue.dart';
 import '../../data/issues_data.dart';
 import 'issues_event.dart';
+import 'package:http/http.dart' as http;
 
 class IssuesBloc {
   // Private. StreamController is like a box with two holes
@@ -33,12 +34,15 @@ class IssuesBloc {
   }
 
   // Map the event to a new state
-  void _mapEventToState(IssuesEvent event) {
+  Future<void> _mapEventToState(IssuesEvent event) async {
     // Capture the event received
     if(event is InitializeIssueData){
       // Initialize issues
       // Add the value to the sink of our issues state controller to make sure
       // that this gets output through its stream
+
+      await IssuesData().fetchIssueData(event.issuesPage);
+
       _inIssues.add(IssuesData().initializeIssuesData());
     }else if(event is SearchIssue){
       if(event.issueTitle != ""){

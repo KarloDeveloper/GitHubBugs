@@ -2,7 +2,12 @@
 abstract class IssuesEvent {}
 
 // Event
-class InitializeIssueData extends IssuesEvent {}
+class InitializeIssueData extends IssuesEvent {
+  // Issues page
+  final int issuesPage;
+  // This constructor is used to capture the issue page
+  InitializeIssueData(this.issuesPage);
+}
 
 // Event
 class SearchIssue extends IssuesEvent {
