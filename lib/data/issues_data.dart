@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
 import '../class/issue.dart';
@@ -12,6 +11,10 @@ class IssuesData {
   Future fetchIssueData(int issuePage) async {
     _issuesFetched.clear();
 
+    // Curl command for authentication
+    // curl -i -u KarloDeveloper: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 https://api.github.com/repos/flutter/flutter/issues?per_page=20&page=$issuePage
+
+    // Fetch issues from Flutter repo using GitHub API
     final response = await http.get(
         Uri.parse('https://api.github.com/repos/flutter/flutter/issues?per_page=20&page=$issuePage'))
         .timeout(const Duration(seconds: 10));
@@ -22,10 +25,6 @@ class IssuesData {
       _issuesFetched = jsonDecode(response.body).map<Issue>((json) => Issue.fromJson(json)).toList();
       // Combining lists
       _issuesList.addAll(_issuesFetched);
-    } else if (response.statusCode == 403){
-      // Forbidden
-      _issuesFetched.clear();
-      _issuesList.clear();
     } else {
       // If the server did not return a 200 OK response,
       // then throw an exception.
@@ -33,7 +32,23 @@ class IssuesData {
     }
   }
 
+  // Return the list of fetched issues from server
   List<Issue> initializeIssuesData() {
+    return _issuesList;
+  }
+
+  // Issues list sorting function
+  List<Issue> sortIssuesData(String sortType) {
+    // Look for which sorting type the user wants to apply
+    if(sortType == "creation"){
+      _issuesList.sort((b, a) => a.creationDate!.compareTo(b.creationDate!));
+    }else if(sortType == "updated"){
+      _issuesList.sort((b, a) => a.updateDate!.compareTo(b.updateDate!));
+    }else if(sortType == "comments"){
+      _issuesList.sort((b, a) => a.numComments!.compareTo(b.numComments!));
+    }
+
+    // Return the sorted list
     return _issuesList;
   }
 
@@ -51,6 +66,13 @@ class IssuesData {
       }
     }
 
+    // Return the list with the search results
     return issueSearchResult;
+  }
+
+  // Set already viewed issue
+  List<Issue> setIssueViewed(int issueIndex) {
+    _issuesList.elementAt(issueIndex).viewed = true;
+    return _issuesList;
   }
 }

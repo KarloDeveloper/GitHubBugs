@@ -16,3 +16,19 @@ class SearchIssue extends IssuesEvent {
   // This constructor is used to capture the issue the user is looking for
   SearchIssue(this.issueTitle);
 }
+
+// Event
+class SortIssues extends IssuesEvent {
+  // Sort type
+  final String sortType;
+  // Constructor used to capture issue sorting type
+  SortIssues(this.sortType);
+}
+
+// Event
+class SetIssueViewed extends IssuesEvent {
+  // Issue position on list
+  int issueIndex;
+  // Constructor used to capture issue index of the list
+  SetIssueViewed(this.issueIndex);
+}

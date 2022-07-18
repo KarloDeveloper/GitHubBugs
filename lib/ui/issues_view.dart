@@ -3,6 +3,7 @@ import 'package:github_bugs/bloc/issues/issues_bloc.dart';
 import 'package:github_bugs/bloc/issues/issues_event.dart';
 
 import '../class/issue.dart';
+import 'issue_info_view.dart';
 
 class IssuesView extends StatefulWidget {
   const IssuesView({Key? key}) : super(key: key);
@@ -18,6 +19,11 @@ class _IssuesViewState extends State<IssuesView> {
 
   int _issuePage = 1;
 
+  @override
+  void initState(){
+    _bloc.issuesEventSink.add(InitializeIssueData(_issuePage));
+    super.initState();
+  }
 
   // Dispose resources to avoid memory leaks
   @override
@@ -28,8 +34,6 @@ class _IssuesViewState extends State<IssuesView> {
 
   @override
   Widget build(BuildContext context) {
-    _bloc.issuesEventSink.add(InitializeIssueData(_issuePage));
-
     _scrollController.addListener(() {
       // Detect scroll reaching an edge
       if (_scrollController.position.atEdge) {
@@ -120,7 +124,7 @@ class _IssuesViewState extends State<IssuesView> {
                                     elevation: 0,
                                   ),
                                   onPressed: () {
-
+                                    _bloc.issuesEventSink.add(SortIssues("creation"));
                                   },
                                   child: RichText(
                                     text: const TextSpan(
@@ -146,6 +150,7 @@ class _IssuesViewState extends State<IssuesView> {
                                     elevation: 0,
                                   ),
                                   onPressed: () {
+                                    _bloc.issuesEventSink.add(SortIssues("updated"));
                                   },
                                   child: RichText(
                                     text: const TextSpan(
@@ -171,6 +176,7 @@ class _IssuesViewState extends State<IssuesView> {
                                     elevation: 0,
                                   ),
                                   onPressed: () {
+                                    _bloc.issuesEventSink.add(SortIssues("comments"));
                                   },
                                   child: RichText(
                                     text: const TextSpan(
@@ -205,20 +211,30 @@ class _IssuesViewState extends State<IssuesView> {
                                   itemCount: snapshot.data!.length,
                                   itemBuilder: (context, i) {
                                     return GestureDetector(
-                                      // TODO: Pass the issue id to the next view
                                       onTap: () {
+                                        // Set tap issue to viewed
+                                        _bloc.issuesEventSink.add(SetIssueViewed(i));
 
+                                        // Pass issue id to details screen
+                                        Navigator.push(
+                                            context,
+                                            PageRouteBuilder(
+                                              pageBuilder: (context, animation1, animation2) => IssueInfoView(issueNumber: snapshot.data!.elementAt(i).number!,),
+                                              transitionDuration: Duration.zero,
+                                            ));
                                       },
                                       child: Container(
                                         height: double.infinity,
                                         width: double.infinity,
                                         decoration: BoxDecoration(
-                                          gradient: const LinearGradient(
+                                          gradient: LinearGradient(
                                             begin: Alignment.topRight,
                                             end: Alignment.bottomLeft,
                                             colors: [
-                                              Color(0xFFFFFFFF),
-                                              Color(0xFFFFFFFF),
+                                              snapshot.data?.elementAt(i).viewed == true ?
+                                              const Color(0xFFFFCDD2): const Color(0xFFFFFFFF),
+                                              snapshot.data?.elementAt(i).viewed == true ?
+                                              const Color(0xFFFF5252): const Color(0xFFFFFFFF),
                                             ],
                                           ),
                                           borderRadius: const BorderRadius.only(
@@ -239,37 +255,71 @@ class _IssuesViewState extends State<IssuesView> {
                                         ),
                                         child: Padding(
                                           padding: const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            mainAxisAlignment: MainAxisAlignment.start,
+                                          child: Stack(
                                             children: [
-                                              Text(
-                                                '${snapshot.data?.elementAt(i).title}',
-                                                style: const TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.black
-                                                ),
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-
-                                              //const SizedBox(height: 5,),
-                                              const Divider(thickness: 1, height: 20, color: Colors.grey),
-                                              //const SizedBox(height: 5,),
-
-                                              Flexible(
-                                                child: Text(
-                                                  '${snapshot.data?.elementAt(i).description}',
-                                                  style: const TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight: FontWeight.normal,
-                                                      color: Colors.black
+                                              Column(
+                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                mainAxisAlignment: MainAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '${snapshot.data?.elementAt(i).title}',
+                                                    style: const TextStyle(
+                                                        fontSize: 14,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.black
+                                                    ),
+                                                    overflow: TextOverflow.ellipsis,
                                                   ),
-                                                  //overflow: TextOverflow.ellipsis,
-                                                ),
+
+                                                  const Divider(thickness: 1, height: 20, color: Colors.grey),
+
+                                                  Flexible(
+                                                    child: Text(
+                                                      '${snapshot.data?.elementAt(i).description}',
+                                                      style: const TextStyle(
+                                                          fontSize: 14,
+                                                          fontWeight: FontWeight.normal,
+                                                          color: Colors.black
+                                                      ),
+                                                      //overflow: TextOverflow.ellipsis,
+                                                    ),
+                                                  ),
+
+                                                  const Divider(thickness: 1, height: 20, color: Colors.grey),
+
+                                                  Text(
+                                                    'Creation: ${snapshot.data?.elementAt(i).creationDate}',
+                                                    style: const TextStyle(
+                                                        fontSize: 8,
+                                                        fontWeight: FontWeight.normal,
+                                                        color: Colors.black
+                                                    ),
+                                                    //overflow: TextOverflow.ellipsis,
+                                                  ),
+
+                                                  Text(
+                                                    'Updated: ${snapshot.data?.elementAt(i).updateDate}',
+                                                    style: const TextStyle(
+                                                        fontSize: 8,
+                                                        fontWeight: FontWeight.normal,
+                                                        color: Colors.black
+                                                    ),
+                                                    //overflow: TextOverflow.ellipsis,
+                                                  ),
+
+                                                  Text(
+                                                    'Comments: ${snapshot.data?.elementAt(i).numComments}',
+                                                    style: const TextStyle(
+                                                        fontSize: 8,
+                                                        fontWeight: FontWeight.normal,
+                                                        color: Colors.black
+                                                    ),
+                                                    //overflow: TextOverflow.ellipsis,
+                                                  ),
+                                                ],
                                               ),
                                             ],
-                                          ),
+                                          )
                                         ),
                                       ),
                                     );

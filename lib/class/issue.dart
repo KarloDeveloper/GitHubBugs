@@ -1,22 +1,19 @@
-import 'package:github_bugs/class/user.dart';
-import 'assignee.dart';
-
 class Issue {
   String? title;
-  String? author;
   String? description;
   String? creationDate;
-  String? issueID;
-  String? issueNumber;
-  String? state;
-  String? isLocked;
-  String? numComments;
-  User? user;
-  List<Assignee>? assignees;
+  String? updateDate;
+  int? number;
+  int? numComments;
+  bool? viewed;
 
-  Issue(this.title, this.description);
+  Issue(this.title, this.description, this.creationDate, this.updateDate, this.number, this.numComments, this.viewed);
 
   Issue.fromJson(Map<String, dynamic> json)
       : title = json["title"],
-        description = json["body"];
+        description = json["body"],
+        creationDate = json["created_at"],
+        updateDate = json["updated_at"],
+        number = json["number"],
+        numComments = json["comments"];
 }

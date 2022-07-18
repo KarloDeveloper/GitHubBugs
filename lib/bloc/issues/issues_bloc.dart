@@ -2,7 +2,6 @@ import 'dart:async';
 import '../../class/issue.dart';
 import '../../data/issues_data.dart';
 import 'issues_event.dart';
-import 'package:http/http.dart' as http;
 
 class IssuesBloc {
   // Private. StreamController is like a box with two holes
@@ -48,11 +47,17 @@ class IssuesBloc {
       if(event.issueTitle != ""){
         // Search for a specific issue matching the user text input
         _inIssues.add(IssuesData().searchIssue(event.issueTitle));
-      }else if(event.issueTitle == "") {
+      }else if(event.issueTitle == ""){
         // Retrieve all issues (there could be new issues) when text controller
         // is empty
         _inIssues.add(IssuesData().initializeIssuesData());
       }
+    }else if(event is SortIssues){
+      // Sort issues
+      _inIssues.add(IssuesData().sortIssuesData(event.sortType));
+    }else if(event is SetIssueViewed){
+      // Set issue tapped as viewed
+      _inIssues.add(IssuesData().setIssueViewed(event.issueIndex));
     }
   }
 
