@@ -6,5 +6,5 @@ class Assignee {
 
   Assignee.fromJson(Map<String, dynamic> json)
       : login = json["login"],
-        avatar = json["avatar"];
+        avatar = json["avatar_url"];
 }

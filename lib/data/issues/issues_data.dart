@@ -1,7 +1,7 @@
 import 'dart:convert';
 // ignore: depend_on_referenced_packages
 import 'package:http/http.dart' as http;
-import '../class/issue.dart';
+import '../../class/issue.dart';
 
 List<Issue> _issuesList = [];
 List<Issue> _issuesFetched = [];

@@ -1,6 +1,6 @@
 import 'dart:async';
 import '../../class/issue.dart';
-import '../../data/issues_data.dart';
+import '../../data/issues/issues_data.dart';
 import 'issues_event.dart';
 
 class IssuesBloc {
