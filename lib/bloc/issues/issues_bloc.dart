@@ -3,6 +3,8 @@ import '../../class/issue.dart';
 import '../../data/issues/issues_data.dart';
 import 'issues_event.dart';
 
+int _issuePage = 1;
+
 class IssuesBloc {
   // Private. StreamController is like a box with two holes
   // (in 'Event')-> [ ] ->(out 'State')
@@ -39,9 +41,8 @@ class IssuesBloc {
       // Initialize issues
       // Add the value to the sink of our issues state controller to make sure
       // that this gets output through its stream
-
+      IssuesData().clearList(); _issuePage = 1;
       await IssuesData().fetchIssueData(event.issuesPage);
-
       _inIssues.add(IssuesData().initializeIssuesData());
     }else if(event is SearchIssue){
       if(event.issueTitle != ""){
@@ -58,6 +59,23 @@ class IssuesBloc {
     }else if(event is SetIssueViewed){
       // Set issue tapped as viewed
       _inIssues.add(IssuesData().setIssueViewed(event.issueIndex));
+    }else if(event is FilterIssues){
+      // Fetch issues by filter.
+      IssuesData().clearList(); _issuePage = 1;
+      await IssuesData().fetchFilteredIssueData(event.issuesPage, event.filterType);
+      _inIssues.add(IssuesData().initializeIssuesData());
+    }else if(event is PaginationControl){
+      // Fetch next page from API.
+      _issuePage = _issuePage + 1;
+
+      // Control where to apply pagination
+      if(event.filterType == "all"){
+        await IssuesData().fetchIssueData(_issuePage);
+        _inIssues.add(IssuesData().initializeIssuesData());
+      }else{
+        await IssuesData().fetchFilteredIssueData(_issuePage, event.filterType);
+        _inIssues.add(IssuesData().initializeIssuesData());
+      }
     }
   }
 

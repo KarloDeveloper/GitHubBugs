@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:github_bugs/bloc/issues/issues_bloc.dart';
 import 'package:github_bugs/bloc/issues/issues_event.dart';
-
+import 'package:intl/intl.dart';
 import '../class/issue.dart';
 import 'issue_info_view.dart';
 
@@ -17,11 +17,11 @@ class _IssuesViewState extends State<IssuesView> {
   final TextEditingController _searchIssueController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
-  int _issuePage = 1;
+  String _filterType = "all";
 
   @override
   void initState(){
-    _bloc.issuesEventSink.add(InitializeIssueData(_issuePage));
+    _bloc.issuesEventSink.add(InitializeIssueData(1));
     super.initState();
   }
 
@@ -39,9 +39,7 @@ class _IssuesViewState extends State<IssuesView> {
       if (_scrollController.position.atEdge) {
         // Detect if the scroll is at bottom position
         if (_scrollController.position.pixels != 0) {
-          // Fetch next page from API.
-          _issuePage = _issuePage + 1;
-          _bloc.issuesEventSink.add(InitializeIssueData(_issuePage));
+          _bloc.issuesEventSink.add(PaginationControl(_filterType));
         }
       }
     });
@@ -61,12 +59,12 @@ class _IssuesViewState extends State<IssuesView> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
                       const Padding(
-                        padding: EdgeInsets.only(bottom: 40),
+                        padding: EdgeInsets.only(bottom: 30),
                         child: Text(
                           'GitHub Repo Issues Analyzer',
                           style: TextStyle(
                               color: Colors.black,
-                              fontSize: 30,
+                              fontSize: 28,
                               fontWeight: FontWeight.bold
                           ),
                         ),
@@ -106,8 +104,20 @@ class _IssuesViewState extends State<IssuesView> {
                         ),
                       ),
 
+                      const Padding(
+                        padding: EdgeInsets.only(top: 20, bottom: 10),
+                        child: Text(
+                          'Order by:',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+
                       Container(
-                          margin: const EdgeInsets.only(left: 0, top: 20, bottom: 20),
+                          margin: const EdgeInsets.only(left: 0, top: 0, bottom: 20),
                           height: 30.0,
                           child: ListView(
                             physics: const BouncingScrollPhysics(),
@@ -194,6 +204,137 @@ class _IssuesViewState extends State<IssuesView> {
                           )
                       ),
 
+                      const Padding(
+                        padding: EdgeInsets.only(top: 0, bottom: 10),
+                        child: Text(
+                          'Filter by:',
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold
+                          ),
+                        ),
+                      ),
+
+                      Container(
+                          margin: const EdgeInsets.only(left: 0, top: 0, bottom: 20),
+                          height: 30.0,
+                          child: ListView(
+                            physics: const BouncingScrollPhysics(),
+                            scrollDirection: Axis.horizontal,
+                            children: <Widget>[
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(45.0),
+
+                                    ),
+                                    side: const BorderSide(width: 1.0, color: Colors.grey),
+                                    primary: Colors.white,
+                                    elevation: 0,
+                                  ),
+                                  onPressed: () {
+                                    // Fetch all issues
+                                    _filterType = "all";
+                                    _bloc.issuesEventSink.add(InitializeIssueData(1));
+                                  },
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      text: 'Filter by ',
+                                      style: TextStyle(fontSize: 14, color: Colors.black,),
+                                      children: <TextSpan>[
+                                        TextSpan(text: 'all', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  )
+                              ),
+
+                              const SizedBox(width: 15,),
+
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(45.0),
+
+                                    ),
+                                    side: const BorderSide(width: 1.0, color: Colors.grey),
+                                    primary: Colors.white,
+                                    elevation: 0,
+                                  ),
+                                  onPressed: () {
+                                    _filterType = "state:open";
+                                    _bloc.issuesEventSink.add(FilterIssues(1, _filterType));
+                                  },
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      text: 'Filter by ',
+                                      style: TextStyle(fontSize: 14, color: Colors.black,),
+                                      children: <TextSpan>[
+                                        TextSpan(text: 'open', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  )
+                              ),
+
+                              const SizedBox(width: 15,),
+
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(45.0),
+
+                                    ),
+                                    side: const BorderSide(width: 1.0, color: Colors.grey),
+                                    primary: Colors.white,
+                                    elevation: 0,
+                                  ),
+                                  onPressed: () {
+                                    _filterType = "no:assignee";
+                                    _bloc.issuesEventSink.add(FilterIssues(1, _filterType));
+                                  },
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      text: 'Filter by ',
+                                      style: TextStyle(fontSize: 14, color: Colors.black,),
+                                      children: <TextSpan>[
+                                        TextSpan(text: 'unassigned', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  )
+                              ),
+
+                              const SizedBox(width: 15,),
+
+                              ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(45.0),
+
+                                    ),
+                                    side: const BorderSide(width: 1.0, color: Colors.grey),
+                                    primary: Colors.white,
+                                    elevation: 0,
+                                  ),
+                                  onPressed: () {
+                                    _filterType = 'created:${DateFormat('yyyy-MM-dd').format(DateTime.now())}';
+                                    _bloc.issuesEventSink.add(FilterIssues(1, _filterType));
+                                  },
+                                  child: RichText(
+                                    text: const TextSpan(
+                                      text: 'Filter by ',
+                                      style: TextStyle(fontSize: 14, color: Colors.black,),
+                                      children: <TextSpan>[
+                                        TextSpan(text: 'created today', style: TextStyle(fontSize: 14, color: Colors.red, fontWeight: FontWeight.bold)),
+                                      ],
+                                    ),
+                                  )
+                              ),
+
+                              const SizedBox(width: 20.0),
+                            ],
+                          )
+                      ),
+
                       Expanded(
                           child: StreamBuilder<List<Issue>>(
                             stream: _bloc.issues,
@@ -232,9 +373,9 @@ class _IssuesViewState extends State<IssuesView> {
                                             end: Alignment.bottomLeft,
                                             colors: [
                                               snapshot.data?.elementAt(i).viewed == true ?
-                                              const Color(0xFFFFCDD2): const Color(0xFFFFFFFF),
+                                              const Color(0xFFEEEEEE): const Color(0xFFFFFFFF),
                                               snapshot.data?.elementAt(i).viewed == true ?
-                                              const Color(0xFFFF5252): const Color(0xFFFFFFFF),
+                                              const Color(0xFFBDBDBD): const Color(0xFFFFFFFF),
                                             ],
                                           ),
                                           borderRadius: const BorderRadius.only(
@@ -287,34 +428,34 @@ class _IssuesViewState extends State<IssuesView> {
 
                                                   const Divider(thickness: 1, height: 20, color: Colors.grey),
 
-                                                  Text(
-                                                    'Creation: ${snapshot.data?.elementAt(i).creationDate}',
-                                                    style: const TextStyle(
-                                                        fontSize: 8,
-                                                        fontWeight: FontWeight.normal,
-                                                        color: Colors.black
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      text: 'Creation: ',
+                                                      style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.bold,),
+                                                      children: <TextSpan>[
+                                                        TextSpan(text: DateFormat.MMMMd().add_Hm().format(DateTime.parse(snapshot.data!.elementAt(i).creationDate!)), style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.normal)),
+                                                      ],
                                                     ),
-                                                    //overflow: TextOverflow.ellipsis,
                                                   ),
 
-                                                  Text(
-                                                    'Updated: ${snapshot.data?.elementAt(i).updateDate}',
-                                                    style: const TextStyle(
-                                                        fontSize: 8,
-                                                        fontWeight: FontWeight.normal,
-                                                        color: Colors.black
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      text: 'Updated: ',
+                                                      style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.bold,),
+                                                      children: <TextSpan>[
+                                                        TextSpan(text: DateFormat.MMMMd().add_Hm().format(DateTime.parse(snapshot.data!.elementAt(i).updateDate!)), style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.normal)),
+                                                      ],
                                                     ),
-                                                    //overflow: TextOverflow.ellipsis,
                                                   ),
 
-                                                  Text(
-                                                    'Comments: ${snapshot.data?.elementAt(i).numComments}',
-                                                    style: const TextStyle(
-                                                        fontSize: 8,
-                                                        fontWeight: FontWeight.normal,
-                                                        color: Colors.black
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      text: 'Comments: ',
+                                                      style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.bold,),
+                                                      children: <TextSpan>[
+                                                        TextSpan(text: '${snapshot.data?.elementAt(i).numComments}', style: const TextStyle(fontSize: 11, color: Colors.black, fontWeight: FontWeight.normal)),
+                                                      ],
                                                     ),
-                                                    //overflow: TextOverflow.ellipsis,
                                                   ),
                                                 ],
                                               ),

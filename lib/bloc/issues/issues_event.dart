@@ -32,3 +32,22 @@ class SetIssueViewed extends IssuesEvent {
   // Constructor used to capture issue index of the list
   SetIssueViewed(this.issueIndex);
 }
+
+// Event
+class FilterIssues extends IssuesEvent {
+  // Filter issues page
+  final int issuesPage;
+  final String filterType;
+
+  // This constructor is used to capture the issue page
+  FilterIssues(this.issuesPage, this.filterType);
+}
+
+// Event
+class PaginationControl extends IssuesEvent {
+  // Pagination control string
+  final String filterType;
+
+  // This constructor is used to capture the pagination status
+  PaginationControl(this.filterType);
+}

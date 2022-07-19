@@ -39,9 +39,7 @@ class IssueDetailBloc {
       // Initialize issues
       // Add the value to the sink of our issues state controller to make sure
       // that this gets output through its stream
-
       await IssueDetailsData().fetchIssueDetailData(event.issueNumber);
-
       _inIssuesDetails.add(IssueDetailsData().initializeIssueDetailData());
     }
   }
