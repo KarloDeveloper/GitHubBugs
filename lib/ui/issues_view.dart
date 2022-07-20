@@ -22,6 +22,17 @@ class _IssuesViewState extends State<IssuesView> {
   @override
   void initState(){
     _bloc.issuesEventSink.add(InitializeIssueData(1));
+
+    _scrollController.addListener(() {
+      // Detect scroll reaching an edge
+      if (_scrollController.position.atEdge) {
+        // Detect if the scroll is at bottom position
+        if (_scrollController.position.pixels != 0) {
+          _bloc.issuesEventSink.add(PaginationControl(_filterType));
+        }
+      }
+    });
+
     super.initState();
   }
 
@@ -34,16 +45,6 @@ class _IssuesViewState extends State<IssuesView> {
 
   @override
   Widget build(BuildContext context) {
-    _scrollController.addListener(() {
-      // Detect scroll reaching an edge
-      if (_scrollController.position.atEdge) {
-        // Detect if the scroll is at bottom position
-        if (_scrollController.position.pixels != 0) {
-          _bloc.issuesEventSink.add(PaginationControl(_filterType));
-        }
-      }
-    });
-
     return SafeArea(
       top: true,
       bottom: true,
